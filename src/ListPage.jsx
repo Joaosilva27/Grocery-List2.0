@@ -40,9 +40,12 @@ function ListPage() {
   useEffect(() => {
     if (!user || !listName) return;
 
+    // Normalize the list name, remove accents, and slashes.
     const decodedListName = listName
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\//g, "");
+      .normalize("NFD") // Normalize to decompose accented characters (e.g., João -> Jo + ão)
+      .replace(/[\u0300-\u036f]/g, "") // Remove diacritical marks (accents, etc.)
+      .replace(/\//g, ""); // Remove slashes
+
     const listsRef = collection(db, "lists");
     const listQuery = query(listsRef, where("name", "==", decodedListName));
 
