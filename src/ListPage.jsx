@@ -40,7 +40,9 @@ function ListPage() {
   useEffect(() => {
     if (!user || !listName) return;
 
-    const decodedListName = listName.replace(/-/g, " ");
+    const decodedListName = listName
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\//g, "");
     const listsRef = collection(db, "lists");
     const listQuery = query(listsRef, where("name", "==", decodedListName));
 
