@@ -1,28 +1,29 @@
-# Grocery List App
+# Grocery List App 2.0
 
-Grocery list app built using React JS, Firebase and Tailwind.
+Grocery list app built using React JS, Firebase and Tailwind. 
 
-Visit it here: https://grocerylist27.netlify.app/
+This is a real-time collaborative grocery list application. Create, share, and manage shopping lists with your household, partner or friends. Are you lonely? Perfect! You can use the [1.0 version](https://github.com/Joaosilva27/grocery-list) of this app.
+
+Feel free to use the app: https://grocery-list20.vercel.app/
 
 API used to display image results: https://serper.dev/
 
-https://github.com/Joaosilva27/grocery-list/assets/94570140/5a5da7c9-b28c-4150-8177-960201113a5d
+## Features
+
+- **Real-time Sync** - Instant updates across all devices
+- **Image Search** - Automatic product image fetching
+- **Google Authentication** - Secure login with Firebase
+- **Recent Lists** - Quick access to recently viewed lists
+- **Collaborative** - Share lists with multiple users
+- **Responsive Design** - Works on all devices
 
 
+## Video Demonstration
 
-# Desktop
-
-<img width="1440" alt="Screenshot 2024-05-02 at 11 08 26" src="https://github.com/Joaosilva27/grocery-list/assets/94570140/d4d09982-a5cd-4a7f-9527-c6dd5b6fb32c">
-
+https://github.com/user-attachments/assets/6b376bf8-994b-47e9-80bf-1aeb74025b7b
 
 
-# Mobile
-
-<img width="320" alt="Screenshot 2024-05-02 at 11 10 03" src="https://github.com/Joaosilva27/grocery-list/assets/94570140/69503074-cdd0-49f7-a62e-99d482ad9940">
-
-
-
-# React + Vite
+## React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
