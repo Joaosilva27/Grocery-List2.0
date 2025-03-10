@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import ListPage from "./ListPage";
 import { auth, db } from "./firebase";
 import { signInWithGoogle, logout } from "./Auth";
 import {
@@ -13,6 +12,8 @@ import {
   doc,
   setDoc,
 } from "firebase/firestore";
+import { setPersistence, browserLocalPersistence } from "firebase/auth";
+import ListPage from "./ListPage";
 
 function ListManager() {
   const [user, setUser] = useState(null);
@@ -21,6 +22,19 @@ function ListManager() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Set Firebase Authentication persistence to local (persists even after closing the app)
+    const setAuthPersistence = async () => {
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+      } catch (error) {
+        console.error("Error setting persistence:", error);
+      }
+    };
+
+    // Set persistence when the component mounts
+    setAuthPersistence();
+
+    // Check the user's authentication state
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         const userRef = doc(db, "users", user.uid);
@@ -37,6 +51,7 @@ function ListManager() {
       setUser(user);
     });
 
+    // Load visited lists from localStorage
     const savedLists = JSON.parse(localStorage.getItem("visitedLists")) || [];
     setVisitedLists(savedLists);
 
