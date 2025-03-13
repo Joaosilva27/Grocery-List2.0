@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { setPersistence, browserLocalPersistence } from "firebase/auth";
 import ListPage from "./ListPage";
+import LoadingScreen from "./LoadingScreen";
 
 function ListManager() {
   const [user, setUser] = useState(null);
@@ -106,8 +107,8 @@ function ListManager() {
     localStorage.setItem("visitedLists", JSON.stringify(newVisited));
   };
 
-  if (isLoading == true) {
-    return <h1>LOADING!!!!!!!!!!!</h1>;
+  if (isLoading) {
+    return <LoadingScreen />;
   }
 
   if (!user && isLoading == false) {
