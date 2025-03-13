@@ -19,43 +19,47 @@ function ListManager() {
   const [user, setUser] = useState(null);
   const [listName, setListName] = useState("");
   const [visitedLists, setVisitedLists] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set Firebase Authentication persistence to local (persists even after closing the app)
-    const setAuthPersistence = async () => {
+    let unsubscribe;
+
+    const initializeAuth = async () => {
       try {
         await setPersistence(auth, browserLocalPersistence);
+
+        unsubscribe = auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            const userRef = doc(db, "users", user.uid);
+            await setDoc(
+              userRef,
+              {
+                displayName: user.displayName,
+                email: user.email,
+                lastLogin: serverTimestamp(),
+              },
+              { merge: true }
+            );
+          }
+          setUser(user);
+          setIsLoading(false);
+        });
+
+        const savedLists =
+          JSON.parse(localStorage.getItem("visitedLists")) || [];
+        setVisitedLists(savedLists);
       } catch (error) {
-        console.error("Error setting persistence:", error);
+        console.error("Error initializing auth:", error);
+        setIsLoading(false);
       }
     };
 
-    // Set persistence when the component mounts
-    setAuthPersistence();
+    initializeAuth();
 
-    // Check the user's authentication state
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const userRef = doc(db, "users", user.uid);
-        await setDoc(
-          userRef,
-          {
-            displayName: user.displayName,
-            email: user.email,
-            lastLogin: serverTimestamp(),
-          },
-          { merge: true }
-        );
-      }
-      setUser(user);
-    });
-
-    // Load visited lists from localStorage
-    const savedLists = JSON.parse(localStorage.getItem("visitedLists")) || [];
-    setVisitedLists(savedLists);
-
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const handleListAccess = async (e) => {
@@ -85,7 +89,6 @@ function ListManager() {
         ).values(),
       ];
 
-      // Update both state and localStorage synchronously
       setVisitedLists(newVisited);
       localStorage.setItem("visitedLists", JSON.stringify(newVisited));
 
@@ -103,7 +106,11 @@ function ListManager() {
     localStorage.setItem("visitedLists", JSON.stringify(newVisited));
   };
 
-  if (!user) {
+  if (isLoading == true) {
+    return <h1>LOADING!!!!!!!!!!!</h1>;
+  }
+
+  if (!user && isLoading == false) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-900 px-4">
         <div className="text-center p-8 rounded-xl bg-gray-800 max-w-md w-full">
