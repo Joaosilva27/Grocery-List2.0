@@ -41,15 +41,60 @@ function ListPage() {
       "",
     ]}`
   );
-  const [promptResult, setPromptResult] = useState("");
+  const [promptResult, setPromptResult] = useState([]);
+
+  const parseResponse = (responseText) => {
+    const paragraphs = responseText.split("\n\n");
+    const structuredResponse = paragraphs.map((paragraph) => {
+      if (paragraph.startsWith("**") && paragraph.endsWith("**")) {
+        return { type: "title", content: paragraph.slice(2, -2) };
+      } else if (paragraph.startsWith("-")) {
+        // It's a bullet point
+        return { type: "listItem", content: paragraph.slice(2) };
+      } else {
+        return { type: "text", content: paragraph };
+      }
+    });
+
+    return structuredResponse;
+  };
+
+  // Then render the lists in JSX
+  {
+    promptResult.map((item, index) => {
+      if (item.type === "title") {
+        return (
+          <h3 key={index} className="text-xl font-semibold mt-4">
+            {item.content}
+          </h3>
+        );
+      } else if (item.type === "text") {
+        return (
+          <p key={index} className="my-2">
+            {item.content}
+          </p>
+        );
+      } else if (item.type === "listItem") {
+        return (
+          <li key={index} className="ml-4 list-disc">
+            {item.content}
+          </li>
+        );
+      }
+      return null;
+    });
+  }
 
   const onPromptSubmit = async () => {
     try {
       const result = await model.generateContent(prompt);
-      setPromptResult(result.response.text());
-      console.log(result.response.text());
+      const parsedResponse = parseResponse(result.response.text());
+
+      // Ensure parsedResponse is always an array, even if empty
+      setPromptResult(parsedResponse || []); // Set it to an empty array if parsing fails
     } catch (err) {
       console.log(err);
+      setPromptResult([]); // In case of an error, reset to an empty array
     }
   };
 
@@ -283,7 +328,26 @@ function ListPage() {
           <span onClick={onPromptSubmit} className="underline text-xs">
             Ask AI for recipes.
           </span>
-          <div className="text-xs">{promptResult || "No response"}</div>
+          <div className="text-xs">
+            {promptResult.length === 0
+              ? ""
+              : promptResult.map((item, index) => {
+                  if (item.type === "title") {
+                    return (
+                      <h3 key={index} className="text-xl font-semibold mt-4">
+                        {item.content}
+                      </h3>
+                    );
+                  } else if (item.type === "text") {
+                    return (
+                      <p key={index} className="my-2">
+                        {item.content}
+                      </p>
+                    );
+                  }
+                  return null;
+                })}
+          </div>
         </div>
       </div>
     </div>

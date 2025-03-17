@@ -52,3 +52,126 @@
     opacity: 0.5;
   }
 }
+
+/* Add these styles to make titles and text visually appealing */
+/* You can define more specific styles as needed */
+.text-xl {
+  font-size: 1.5rem; /* Larger font for titles */
+  color: #ffffff;
+  margin-bottom: 0.5rem; /* Add spacing below title */
+}
+
+.font-semibold {
+  font-weight: 600; /* Bold titles */
+}
+
+.my-2 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.text-xs {
+  font-size: 0.8rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.recipe-list {
+  list-style-type: disc; /* Use disc bullets */
+  padding-left: 1.5rem; /* Add left padding for bullets */
+}
+
+.recipe-list li {
+  margin-bottom: 0.25rem; /* Space between list items */
+  color: #ddd;
+}
+
+/* Style for the entire container */
+.ai-response-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #4a5568; /* Subtle border */
+  border-radius: 0.5rem;
+  background-color: #2d3748; /* Darker background */
+}
+
+/* Style for individual paragraphs */
+.ai-paragraph {
+  margin-bottom: 0.5rem;
+  color: #edf2f7; /* Light text color */
+  line-height: 1.6;
+}
+
+/* Style for list items */
+.ai-list-item {
+  color: #cbd5e0;
+  margin-left: 1.5rem;
+  list-style-type: disc;
+}
+
+/* You can define more specific styles as needed */
+.text-xl {
+  font-size: 1.5rem; /* Larger font for titles */
+  color: #ffffff;
+  margin-bottom: 0.5rem; /* Add spacing below title */
+}
+
+.font-semibold {
+  font-weight: 600; /* Bold titles */
+}
+
+.my-2 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.text-xs {
+  font-size: 0.8rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.recipe-list {
+  list-style-type: disc; /* Use disc bullets */
+  padding-left: 1.5rem; /* Add left padding for bullets */
+}
+
+.recipe-list li {
+  margin-bottom: 0.25rem; /* Space between list items */
+  color: #ddd;
+}
+
+/* Style for the entire container */
+.ai-response-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #4a5568; /* Subtle border */
+  border-radius: 0.5rem;
+  background-color: #2d3748; /* Darker background */
+}
+
+/* Style for individual paragraphs */
+.ai-paragraph {
+  margin-bottom: 0.5rem;
+  color: #edf2f7; /* Light text color */
+  line-height: 1.6;
+}
+
+/* Style for list items */
+.ai-list-item {
+  color: #cbd5e0;
+  margin-left: 1.5rem;
+  list-style-type: disc;
+}
