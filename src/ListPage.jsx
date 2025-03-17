@@ -50,9 +50,13 @@ function ListPage() {
   const parseResponse = (responseText) => {
     const paragraphs = responseText.split("\n\n");
     const structuredResponse = paragraphs.map((paragraph) => {
-      // Check for titles (bold text) - Asterisks used for bolding (**)
-      if (paragraph.startsWith("**") && paragraph.endsWith("**")) {
-        return { type: "title", content: paragraph.slice(2, -2) }; // Remove the surrounding ** for titles
+      // Check for titles (hashtags used for titles)
+      if (paragraph.startsWith("#") && paragraph.endsWith("#")) {
+        return { type: "title", content: paragraph.slice(1, -1).trim() }; // Remove the surrounding # for titles
+      }
+      // Check for bold text (Asterisks used for bold text **)
+      else if (paragraph.startsWith("**") && paragraph.endsWith("**")) {
+        return { type: "bold", content: paragraph.slice(2, -2) }; // Remove the surrounding ** for bold text
       }
       // Check for bullet points (lines starting with asterisk * or hyphen -)
       else if (paragraph.startsWith("*")) {
@@ -167,14 +171,14 @@ function ListPage() {
         ...doc.data(),
       }));
 
-      setGroceryItems(newItems);
+      setGroceryItems(newItems); // aoifj
 
       const itemNames = newItems.map((item) => item.itemName);
       setIngredients(itemNames);
 
       const newPrompt = `I am using your prompt answer for my grocery list app where the user is able to click on a button called "search for a recipe" based on the grocery list items they have in their cart. You will reply to the user and bare in mind they are not able to reply to you, so do not ask the user any question since they cannot reply. Do not speak to me, speak directly to ${
         user.displayName
-      } (it's the user's name). You are not limited for recipes with only the grocery list items, you can obviously include basic items that most households have - for example milk, sugar, salt, water, etc... Based on what I just told you, give me recipe ideas that I could make with these items / ingredients: ${itemNames.join(
+      } (it's my name). Also, make sure to include some titles to your response. You are not limited for recipes with only the grocery list items, you can obviously include basic items that most households have - for example milk, sugar, salt, water, etc... Based on what I just told you, give me recipe ideas that I could make with these items / ingredients: ${itemNames.join(
         ", "
       )}`;
       setPrompt(newPrompt);
@@ -361,12 +365,19 @@ function ListPage() {
             {isLoading ? (
               <LoadingScreen />
             ) : (
+              groceryItems.length != 0 &&
               promptResult.map((item, index) => {
                 if (item.type === "title") {
                   return (
-                    <h3 key={index} className="text-xl font-semibold mt-4">
+                    <h3 key={index} className="text-2xl font-bold mt-4">
                       {item.content}
                     </h3>
+                  );
+                } else if (item.type === "bold") {
+                  return (
+                    <p key={index} className="font-bold text-lg my-2">
+                      {item.content}
+                    </p>
                   );
                 } else if (item.type === "text") {
                   return (
