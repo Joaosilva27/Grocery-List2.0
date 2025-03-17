@@ -30,13 +30,18 @@ function ListPage() {
   const [user, setUser] = useState(null);
   const [memberNames, setMemberNames] = useState([]);
   const [listId, setListId] = useState(null);
+  const [ingredients, setIngredients] = useState([]);
 
   const genAI = new GoogleGenerativeAI(
     "AIzaSyAThR2xsb5E_ra5OfeWhqsBy3wiJZch-so"
   );
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-  const [prompt, setPrompt] = useState(["tell me hello in spanish"]);
+  const [prompt, setPrompt] = useState(
+    `Give me recipe ideas that I could make with these items / ingredients: ${[
+      "",
+    ]}`
+  );
   const [promptResult, setPromptResult] = useState("");
 
   const onPromptSubmit = async () => {
@@ -119,6 +124,22 @@ function ListPage() {
     if (!imageSearch.trim() || !listId) return;
 
     try {
+      // Add the new item to the ingredients array
+      const newIngredients = [...ingredients, imageSearch];
+      setIngredients(newIngredients);
+
+      // Update the prompt with the new list of ingredients
+      const newPrompt = `Give me recipe ideas that I could make with these items / ingredients: ${newIngredients.join(
+        ", "
+      )}`;
+      setPrompt(newPrompt); // Update the prompt
+
+      console.log(newPrompt); // Log the updated prompt for debugging
+
+      // Clear the search input
+      setImageSearch("");
+
+      // Perform the image search and add the item to Firestore
       const { data } = await axios.post(
         "https://google.serper.dev/images",
         {
@@ -141,7 +162,6 @@ function ListPage() {
           createdAt: serverTimestamp(),
           addedBy: user.uid,
         });
-        setImageSearch("");
       }
     } catch (error) {
       console.error("Error:", error.message);
