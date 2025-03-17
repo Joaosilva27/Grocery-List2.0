@@ -39,11 +39,13 @@ function ListPage() {
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const [prompt, setPrompt] = useState(
-    `Give me recipe ideas that I could make with these items / ingredients: ${[
+    `I am using your prompt answer for my grocery list app where the user is able to click on a button called "search for a recipe" based on the grocery list items they have in their cart. You will reply to the user and bare in mind they are not able to reply to you, so do not ask the user any question since they cannot reply. You are not limited for recipes with only the grocery list items, you can obviously include basic items that most households have - for example milk, sugar, salt, water, etc... Based on what I just told you, give me recipe ideas that I could make with these items / ingredients: ${[
       "",
     ]}`
   );
   const [promptResult, setPromptResult] = useState([]);
+
+  console.log(promptResult.length);
 
   const parseResponse = (responseText) => {
     const paragraphs = responseText.split("\n\n");
@@ -170,7 +172,9 @@ function ListPage() {
       const itemNames = newItems.map((item) => item.itemName);
       setIngredients(itemNames);
 
-      const newPrompt = `Give me recipe ideas that I could make with these items / ingredients: ${itemNames.join(
+      const newPrompt = `I am using your prompt answer for my grocery list app where the user is able to click on a button called "search for a recipe" based on the grocery list items they have in their cart. You will reply to the user and bare in mind they are not able to reply to you, so do not ask the user any question since they cannot reply. Do not speak to me, speak directly to ${
+        user.displayName
+      } (it's the user's name). You are not limited for recipes with only the grocery list items, you can obviously include basic items that most households have - for example milk, sugar, salt, water, etc... Based on what I just told you, give me recipe ideas that I could make with these items / ingredients: ${itemNames.join(
         ", "
       )}`;
       setPrompt(newPrompt);
@@ -354,9 +358,7 @@ function ListPage() {
           )}
 
           <div className="text-xs">
-            {promptResult.length === 0 ? (
-              ""
-            ) : isLoading ? (
+            {isLoading ? (
               <LoadingScreen />
             ) : (
               promptResult.map((item, index) => {
