@@ -5,7 +5,7 @@ import MinusCartIcon from "./Icons/cart-minus.png";
 import { auth, db } from "./firebase";
 import PropTypes from "prop-types";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
+import { updateDoc } from "firebase/firestore";
 import {
   collection,
   addDoc,
@@ -15,7 +15,6 @@ import {
   doc,
   orderBy,
   serverTimestamp,
-  updateDoc,
   arrayUnion,
   getDocs,
   where,
@@ -65,12 +64,11 @@ function ListPage() {
   useEffect(() => {
     if (!user || !listName) return;
 
-    // Normalize the list name, remove accents, and slashes.
     const decodedListName = listName
-      .normalize("NFD") // Normalize to decompose characters (like João -> Jo + ão)
-      .replace(/[\u0300-\u036f]/g, "") // Remove diacritical marks (accents, etc.)
-      .replace(/\s+/g, "-") // Replace spaces with hyphens
-      .replace(/[^a-zA-Z0-9-]/g, ""); // Remove any non-English characters or special characters
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/[^a-zA-Z0-9-]/g, "");
 
     const listsRef = collection(db, "lists");
     const listQuery = query(listsRef, where("name", "==", decodedListName));
@@ -108,12 +106,20 @@ function ListPage() {
     const q = query(itemsRef, orderBy("createdAt", "desc"));
 
     const unsubscribeItems = onSnapshot(q, (snapshot) => {
-      setGroceryItems(
-        snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-      );
+      const newItems = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setGroceryItems(newItems);
+
+      const itemNames = newItems.map((item) => item.itemName);
+      setIngredients(itemNames);
+
+      const newPrompt = `Give me recipe ideas that I could make with these items / ingredients: ${itemNames.join(
+        ", "
+      )}`;
+      setPrompt(newPrompt);
     });
 
     return () => unsubscribeItems();
@@ -124,22 +130,6 @@ function ListPage() {
     if (!imageSearch.trim() || !listId) return;
 
     try {
-      // Add the new item to the ingredients array
-      const newIngredients = [...ingredients, imageSearch];
-      setIngredients(newIngredients);
-
-      // Update the prompt with the new list of ingredients
-      const newPrompt = `Give me recipe ideas that I could make with these items / ingredients: ${newIngredients.join(
-        ", "
-      )}`;
-      setPrompt(newPrompt); // Update the prompt
-
-      console.log(newPrompt); // Log the updated prompt for debugging
-
-      // Clear the search input
-      setImageSearch("");
-
-      // Perform the image search and add the item to Firestore
       const { data } = await axios.post(
         "https://google.serper.dev/images",
         {
@@ -163,6 +153,8 @@ function ListPage() {
           addedBy: user.uid,
         });
       }
+
+      setImageSearch("");
     } catch (error) {
       console.error("Error:", error.message);
     }
@@ -291,7 +283,7 @@ function ListPage() {
           <span onClick={onPromptSubmit} className="underline text-xs">
             Ask AI for recipes.
           </span>
-          <div>{promptResult || "No response"}</div>
+          <div className="text-xs">{promptResult || "No response"}</div>
         </div>
       </div>
     </div>
