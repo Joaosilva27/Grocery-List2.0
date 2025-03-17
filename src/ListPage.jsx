@@ -4,6 +4,8 @@ import axios from "axios";
 import MinusCartIcon from "./Icons/cart-minus.png";
 import { auth, db } from "./firebase";
 import PropTypes from "prop-types";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
 import {
   collection,
   addDoc,
@@ -28,6 +30,24 @@ function ListPage() {
   const [user, setUser] = useState(null);
   const [memberNames, setMemberNames] = useState([]);
   const [listId, setListId] = useState(null);
+
+  const genAI = new GoogleGenerativeAI(
+    "AIzaSyAThR2xsb5E_ra5OfeWhqsBy3wiJZch-so"
+  );
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+  const [prompt, setPrompt] = useState(["tell me hello in spanish"]);
+  const [promptResult, setPromptResult] = useState("");
+
+  const onPromptSubmit = async () => {
+    try {
+      const result = await model.generateContent(prompt);
+      setPromptResult(result.response.text());
+      console.log(result.response.text());
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -156,23 +176,25 @@ function ListPage() {
   };
 
   const GroceryCard = ({ item }) => (
-    <div className="flex justify-between items-center w-full mb-3">
-      <span className="ml-2 md:ml-6 font-semibold text-white text-sm md:text-base truncate">
-        {item.itemName}
-      </span>
-      <div className="flex items-center gap-2">
-        <img
-          className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
-          src={item.imageUrl}
-          alt={item.itemName}
-          onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
-        />
-        <img
-          className="w-6 h-6 md:w-8 md:h-8 cursor-pointer"
-          src={MinusCartIcon}
-          alt="Remove"
-          onClick={() => onHandleRemoveItem(item.id)}
-        />
+    <div>
+      <div className="flex justify-between items-center w-full mb-3">
+        <span className="ml-2 md:ml-6 font-semibold text-white text-sm md:text-base truncate">
+          {item.itemName}
+        </span>
+        <div className="flex items-center gap-2">
+          <img
+            className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
+            src={item.imageUrl}
+            alt={item.itemName}
+            onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
+          />
+          <img
+            className="w-6 h-6 md:w-8 md:h-8 cursor-pointer"
+            src={MinusCartIcon}
+            alt="Remove"
+            onClick={() => onHandleRemoveItem(item.id)}
+          />
+        </div>
       </div>
     </div>
   );
@@ -244,6 +266,12 @@ function ListPage() {
               {listName.replace(/-/g, " ")} is empty
             </p>
           )}
+        </div>
+        <div className="text-center mt-10">
+          <span onClick={onPromptSubmit} className="underline text-xs">
+            Ask AI for recipes.
+          </span>
+          <div>{promptResult || "No response"}</div>
         </div>
       </div>
     </div>
