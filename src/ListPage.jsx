@@ -20,6 +20,7 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
+import LoadingScreen from "./TinyLoadingScreen";
 
 function ListPage() {
   const { listName } = useParams();
@@ -30,6 +31,7 @@ function ListPage() {
   const [memberNames, setMemberNames] = useState([]);
   const [listId, setListId] = useState(null);
   const [ingredients, setIngredients] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const genAI = new GoogleGenerativeAI(
     "AIzaSyAThR2xsb5E_ra5OfeWhqsBy3wiJZch-so"
@@ -92,11 +94,13 @@ function ListPage() {
 
   const onPromptSubmit = async () => {
     try {
+      setIsLoading(true);
       const result = await model.generateContent(prompt);
       const parsedResponse = parseResponse(result.response.text());
 
       // Ensure parsedResponse is always an array, even if empty
       setPromptResult(parsedResponse || []); // Set it to an empty array if parsing fails
+      setIsLoading(false);
     } catch (err) {
       console.log(err);
       setPromptResult([]); // In case of an error, reset to an empty array
@@ -330,7 +334,7 @@ function ListPage() {
           )}
         </div>
         <div className="text-center mt-10">
-          {groceryItems.length > 0 && (
+          {groceryItems.length > 0 && isLoading == false && (
             <div>
               <button
                 onClick={onPromptSubmit}
@@ -350,30 +354,34 @@ function ListPage() {
           )}
 
           <div className="text-xs">
-            {promptResult.length === 0
-              ? ""
-              : promptResult.map((item, index) => {
-                  if (item.type === "title") {
-                    return (
-                      <h3 key={index} className="text-xl font-semibold mt-4">
-                        {item.content}
-                      </h3>
-                    );
-                  } else if (item.type === "text") {
-                    return (
-                      <p key={index} className="my-2">
-                        {item.content}
-                      </p>
-                    );
-                  } else if (item.type === "listItem") {
-                    return (
-                      <ul key={index} className="recipe-list">
-                        <li>{item.content}</li>
-                      </ul>
-                    );
-                  }
-                  return null;
-                })}
+            {promptResult.length === 0 ? (
+              ""
+            ) : isLoading ? (
+              <LoadingScreen />
+            ) : (
+              promptResult.map((item, index) => {
+                if (item.type === "title") {
+                  return (
+                    <h3 key={index} className="text-xl font-semibold mt-4">
+                      {item.content}
+                    </h3>
+                  );
+                } else if (item.type === "text") {
+                  return (
+                    <p key={index} className="my-2">
+                      {item.content}
+                    </p>
+                  );
+                } else if (item.type === "listItem") {
+                  return (
+                    <ul key={index} className="recipe-list">
+                      <li>{item.content}</li>
+                    </ul>
+                  );
+                }
+                return null;
+              })
+            )}
           </div>
         </div>
       </div>
