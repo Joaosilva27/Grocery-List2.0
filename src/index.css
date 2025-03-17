@@ -175,3 +175,13 @@
   margin-left: 1.5rem;
   list-style-type: disc;
 }
+
+.recipe-list {
+  list-style-type: disc; /* Use disc bullets */
+  padding-left: 1.5rem; /* Add left padding for bullets */
+}
+
+.recipe-list li {
+  margin-bottom: 0.25rem; /* Space between list items */
+  color: #ddd; /* Adjust the color to fit your design */
+}

@@ -46,12 +46,17 @@ function ListPage() {
   const parseResponse = (responseText) => {
     const paragraphs = responseText.split("\n\n");
     const structuredResponse = paragraphs.map((paragraph) => {
+      // Check for titles (bold text) - Asterisks used for bolding (**)
       if (paragraph.startsWith("**") && paragraph.endsWith("**")) {
-        return { type: "title", content: paragraph.slice(2, -2) };
-      } else if (paragraph.startsWith("-")) {
-        // It's a bullet point
-        return { type: "listItem", content: paragraph.slice(2) };
-      } else {
+        return { type: "title", content: paragraph.slice(2, -2) }; // Remove the surrounding ** for titles
+      }
+      // Check for bullet points (lines starting with asterisk * or hyphen -)
+      else if (paragraph.startsWith("*")) {
+        // Remove the leading asterisk and clean up the spaces for bullet points
+        return { type: "listItem", content: paragraph.slice(1).trim() };
+      }
+      // Otherwise, treat it as normal text
+      else {
         return { type: "text", content: paragraph };
       }
     });
@@ -325,9 +330,25 @@ function ListPage() {
           )}
         </div>
         <div className="text-center mt-10">
-          <span onClick={onPromptSubmit} className="underline text-xs">
-            Ask AI for recipes.
-          </span>
+          {groceryItems.length > 0 && (
+            <div>
+              <button
+                onClick={onPromptSubmit}
+                className="underline text-xs text-green-500"
+              >
+                Ask AI for recipes
+              </button>
+              {promptResult.length != 0 && (
+                <button
+                  onClick={() => setPromptResult([])}
+                  className="underline text-xs text-red-400 ml-4"
+                >
+                  Clear text
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="text-xs">
             {promptResult.length === 0
               ? ""
@@ -343,6 +364,12 @@ function ListPage() {
                       <p key={index} className="my-2">
                         {item.content}
                       </p>
+                    );
+                  } else if (item.type === "listItem") {
+                    return (
+                      <ul key={index} className="recipe-list">
+                        <li>{item.content}</li>
+                      </ul>
                     );
                   }
                   return null;
