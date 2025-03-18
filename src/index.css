@@ -185,3 +185,40 @@
   margin-bottom: 0.25rem; /* Space between list items */
   color: #ddd; /* Adjust the color to fit your design */
 }
+
+.ai-response-container h3 {
+  color: #fff;
+  font-size: 1rem;
+  line-height: 2rem;
+  margin-bottom: 1rem;
+}
+
+.ai-response-container h2 {
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 2rem;
+  margin-bottom: 1rem;
+}
+
+.ai-response-container h1 {
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  margin-bottom: 1rem;
+}
+
+.ai-response-container p {
+  color: #ccc;
+  line-height: 1.6;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.ai-response-container ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+}
+
+.ai-response-container li {
+  color: #ddd;
+}

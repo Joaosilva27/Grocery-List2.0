@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import MinusCartIcon from "./Icons/cart-minus.png";
 import { auth, db } from "./firebase";
 import PropTypes from "prop-types";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { updateDoc } from "firebase/firestore";
 import {
   collection,
@@ -41,75 +43,29 @@ function ListPage() {
   const [prompt, setPrompt] = useState(
     `I am using your prompt answer for my grocery list app where the user is able to click on a button called "search for a recipe" based on the grocery list items they have in their cart. You will reply to the user and bare in mind they are not able to reply to you, so do not ask the user any question since they cannot reply. You are not limited for recipes with only the grocery list items, you can obviously include basic items that most households have - for example milk, sugar, salt, water, etc... Based on what I just told you, give me recipe ideas that I could make with these items / ingredients: ${[
       "",
-    ]}`
+    ]}
+
+Please format your response using Markdown:
+- Use headings for recipe titles (e.g., # Recipe Title)
+- Use bullet points for ingredient lists (e.g., - Ingredient)
+- Use paragraphs for descriptions.
+`
   );
-  const [promptResult, setPromptResult] = useState([]);
+  const [promptResult, setPromptResult] = useState("");
 
   console.log(promptResult.length);
-
-  const parseResponse = (responseText) => {
-    const paragraphs = responseText.split("\n\n");
-    const structuredResponse = paragraphs.map((paragraph) => {
-      // Check for titles (hashtags used for titles)
-      if (paragraph.startsWith("#") && paragraph.endsWith("#")) {
-        return { type: "title", content: paragraph.slice(1, -1).trim() }; // Remove the surrounding # for titles
-      }
-      // Check for bold text (Asterisks used for bold text **)
-      else if (paragraph.startsWith("**") && paragraph.endsWith("**")) {
-        return { type: "bold", content: paragraph.slice(2, -2) }; // Remove the surrounding ** for bold text
-      }
-      // Check for bullet points (lines starting with asterisk * or hyphen -)
-      else if (paragraph.startsWith("*")) {
-        // Remove the leading asterisk and clean up the spaces for bullet points
-        return { type: "listItem", content: paragraph.slice(1).trim() };
-      }
-      // Otherwise, treat it as normal text
-      else {
-        return { type: "text", content: paragraph };
-      }
-    });
-
-    return structuredResponse;
-  };
-
-  // Then render the lists in JSX
-  {
-    promptResult.map((item, index) => {
-      if (item.type === "title") {
-        return (
-          <h3 key={index} className="text-xl font-semibold mt-4">
-            {item.content}
-          </h3>
-        );
-      } else if (item.type === "text") {
-        return (
-          <p key={index} className="my-2">
-            {item.content}
-          </p>
-        );
-      } else if (item.type === "listItem") {
-        return (
-          <li key={index} className="ml-4 list-disc">
-            {item.content}
-          </li>
-        );
-      }
-      return null;
-    });
-  }
 
   const onPromptSubmit = async () => {
     try {
       setIsLoading(true);
       const result = await model.generateContent(prompt);
-      const parsedResponse = parseResponse(result.response.text());
+      setPromptResult(result.response.text());
 
-      // Ensure parsedResponse is always an array, even if empty
-      setPromptResult(parsedResponse || []); // Set it to an empty array if parsing fails
       setIsLoading(false);
     } catch (err) {
       console.log(err);
-      setPromptResult([]); // In case of an error, reset to an empty array
+      setPromptResult(""); // In case of an error, reset to an empty string.  Important for ReactMarkdown.
+      setIsLoading(false);
     }
   };
 
@@ -180,7 +136,12 @@ function ListPage() {
         user.displayName
       } (it's my name). Also, make sure to include some titles to your response. You are not limited for recipes with only the grocery list items, you can obviously include basic items that most households have - for example milk, sugar, salt, water, etc... Based on what I just told you, give me recipe ideas that I could make with these items / ingredients: ${itemNames.join(
         ", "
-      )}`;
+      )}
+
+Please format your response using Markdown:
+- Use headings for recipe titles (e.g., # Recipe Title)
+- Use bullet points for ingredient lists (e.g., - Ingredient)
+- Use paragraphs for descriptions.`;
       setPrompt(newPrompt);
     });
 
@@ -352,7 +313,7 @@ function ListPage() {
               </button>
               {promptResult.length != 0 && (
                 <button
-                  onClick={() => setPromptResult([])}
+                  onClick={() => setPromptResult("")}
                   className="underline text-xs text-red-400 ml-4"
                 >
                   Clear text
@@ -365,35 +326,13 @@ function ListPage() {
             {isLoading ? (
               <LoadingScreen />
             ) : (
-              groceryItems.length != 0 &&
-              promptResult.map((item, index) => {
-                if (item.type === "title") {
-                  return (
-                    <h3 key={index} className="text-2xl font-bold mt-4">
-                      {item.content}
-                    </h3>
-                  );
-                } else if (item.type === "bold") {
-                  return (
-                    <p key={index} className="font-bold text-lg my-2">
-                      {item.content}
-                    </p>
-                  );
-                } else if (item.type === "text") {
-                  return (
-                    <p key={index} className="my-2">
-                      {item.content}
-                    </p>
-                  );
-                } else if (item.type === "listItem") {
-                  return (
-                    <ul key={index} className="recipe-list">
-                      <li>{item.content}</li>
-                    </ul>
-                  );
-                }
-                return null;
-              })
+              groceryItems.length != 0 && (
+                <div className="ai-response-container">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {promptResult}
+                  </ReactMarkdown>
+                </div>
+              )
             )}
           </div>
         </div>
