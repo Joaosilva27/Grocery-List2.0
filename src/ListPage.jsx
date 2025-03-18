@@ -326,7 +326,7 @@ Please format your response using Markdown:
             {isLoading ? (
               <LoadingScreen />
             ) : (
-              groceryItems.length != 0 && (
+              promptResult && (
                 <div className="ai-response-container">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {promptResult}
