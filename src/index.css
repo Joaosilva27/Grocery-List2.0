@@ -78,10 +78,6 @@
   font-size: 0.8rem;
 }
 
-.text-center {
-  text-align: center;
-}
-
 /* Style for the entire container */
 .ai-response-container {
   margin-top: 1rem;
@@ -127,10 +123,6 @@
 
 .text-xs {
   font-size: 0.8rem;
-}
-
-.text-center {
-  text-align: center;
 }
 
 .recipe-list {
@@ -215,7 +207,8 @@
 
 .ai-response-container li {
   color: #ddd;
-  line-height: 1.5rem;
+  line-height: 1.35rem;
+  text-align: start;
 }
 
 .ai-response-container p {
