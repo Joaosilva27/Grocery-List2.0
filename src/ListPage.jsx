@@ -140,7 +140,7 @@ Please format your response using Markdown:
 
 Please format your response using Markdown:
 - Use headings for recipe titles (e.g., # Recipe Title)
-- Use bullet points for ingredient lists (e.g., - Ingredient)
+- Use bullet points for ingredient lists (e.g., - Ingredient), but do not use bullet points for the list titles, instead add ## (e.g., ## Ingredients)
 - Use paragraphs for descriptions.`;
       setPrompt(newPrompt);
     });

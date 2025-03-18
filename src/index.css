@@ -180,12 +180,12 @@
   color: #fff;
   font-size: 1rem;
   line-height: 2rem;
-  margin-bottom: 1rem;
   text-decoration: underline;
   margin-top: 1rem;
 }
 
 .ai-response-container h2 {
+  font-style: italic;
   color: #fff;
   font-size: 1.2rem;
   line-height: 2rem;
@@ -206,8 +206,14 @@
   margin-left: 1.5rem;
 }
 
+.ai-response-container ol {
+  list-style-type: decimal;
+  margin-left: 1.5rem;
+}
+
 .ai-response-container li {
   color: #ddd;
+  line-height: 1.5rem;
 }
 
 .ai-response-container p {
