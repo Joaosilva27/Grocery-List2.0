@@ -22,6 +22,17 @@ API used to display image results: https://serper.dev/
 
 https://github.com/user-attachments/assets/6b376bf8-994b-47e9-80bf-1aeb74025b7b
 
+## Tech 
+
+- TypeScript
+
+- React JS
+
+- [Google's Gemini API](https://ai.google.dev/) (to generate recipes based on user's ingredients)
+
+- [Tailwind CSS](https://tailwindcss.com/)
+
+- [Firebase Firestore](https://firebase.google.com/docs/firestore) (backend to store all data)
 
 ## React + Vite
 
