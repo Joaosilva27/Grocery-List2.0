@@ -35,9 +35,7 @@ function ListPage() {
   const [ingredients, setIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const genAI = new GoogleGenerativeAI(
-    "AIzaSyAThR2xsb5E_ra5OfeWhqsBy3wiJZch-so"
-  );
+  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const [prompt, setPrompt] = useState(
@@ -70,7 +68,7 @@ Please format your response using Markdown:
   };
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
       if (!user) navigate("/");
       setUser(user);
     });
@@ -89,7 +87,7 @@ Please format your response using Markdown:
     const listsRef = collection(db, "lists");
     const listQuery = query(listsRef, where("name", "==", decodedListName));
 
-    const unsubscribeList = onSnapshot(listQuery, async (snapshot) => {
+    const unsubscribeList = onSnapshot(listQuery, async snapshot => {
       if (!snapshot.empty) {
         const listDoc = snapshot.docs[0];
         const listData = listDoc.data();
@@ -105,7 +103,7 @@ Please format your response using Markdown:
         const usersRef = collection(db, "users");
         const userQuery = query(usersRef, where("uid", "in", listData.members));
         const userSnapshot = await getDocs(userQuery);
-        const names = userSnapshot.docs.map((doc) => doc.data().displayName);
+        const names = userSnapshot.docs.map(doc => doc.data().displayName);
         setMemberNames(names);
       } else {
         navigate("/");
@@ -121,15 +119,15 @@ Please format your response using Markdown:
     const itemsRef = collection(db, "lists", listId, "items");
     const q = query(itemsRef, orderBy("createdAt", "desc"));
 
-    const unsubscribeItems = onSnapshot(q, (snapshot) => {
-      const newItems = snapshot.docs.map((doc) => ({
+    const unsubscribeItems = onSnapshot(q, snapshot => {
+      const newItems = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
 
-      setGroceryItems(newItems); // aoifj
+      setGroceryItems(newItems);
 
-      const itemNames = newItems.map((item) => item.itemName);
+      const itemNames = newItems.map(item => item.itemName);
       setIngredients(itemNames);
 
       const newPrompt = `I am using your prompt answer for my grocery list app where the user is able to click on a button called "search for a recipe" based on the grocery list items they have in their cart. You will reply to the user and bare in mind they are not able to reply to you, so do not ask the user any question since they cannot reply. Do not speak to me, speak directly to ${
@@ -151,7 +149,7 @@ Please format your response using Markdown:
     return () => unsubscribeItems();
   }, [listId, user]);
 
-  const onHandleSearch = async (e) => {
+  const onHandleSearch = async e => {
     e.preventDefault();
     if (!imageSearch.trim() || !listId) return;
 
@@ -164,7 +162,7 @@ Please format your response using Markdown:
         },
         {
           headers: {
-            "X-API-KEY": "1f75c2b111ad0bd95a563938e5cb0d1cdb8add15",
+            "X-API-KEY": import.meta.env.VITE_SERPER_API_KEY,
             "Content-Type": "application/json",
           },
         }
@@ -172,8 +170,7 @@ Please format your response using Markdown:
 
       if (data.images?.length) {
         await addDoc(collection(db, "lists", listId, "items"), {
-          itemName:
-            imageSearch[0].toUpperCase() + imageSearch.slice(1).toLowerCase(),
+          itemName: imageSearch[0].toUpperCase() + imageSearch.slice(1).toLowerCase(),
           imageUrl: data.images[0].imageUrl,
           createdAt: serverTimestamp(),
           addedBy: user.uid,
@@ -186,7 +183,7 @@ Please format your response using Markdown:
     }
   };
 
-  const onHandleRemoveItem = async (itemId) => {
+  const onHandleRemoveItem = async itemId => {
     if (!listId) return;
     try {
       await deleteDoc(doc(db, "lists", listId, "items", itemId));
@@ -203,7 +200,7 @@ Please format your response using Markdown:
       const snapshot = await getDocs(itemsRef);
       const batch = writeBatch(db);
 
-      snapshot.docs.forEach((doc) => {
+      snapshot.docs.forEach(doc => {
         batch.delete(doc.ref);
       });
 
@@ -215,23 +212,16 @@ Please format your response using Markdown:
 
   const GroceryCard = ({ item }) => (
     <div>
-      <div className="flex justify-between items-center w-full mb-3">
-        <span className="ml-2 md:ml-6 font-semibold text-white text-sm md:text-base truncate">
-          {item.itemName}
-        </span>
-        <div className="flex items-center gap-2">
+      <div className='flex justify-between items-center w-full mb-3'>
+        <span className='ml-2 md:ml-6 font-semibold text-white text-sm md:text-base truncate'>{item.itemName}</span>
+        <div className='flex items-center gap-2'>
           <img
-            className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl"
+            className='w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl'
             src={item.imageUrl}
             alt={item.itemName}
-            onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
+            onError={e => (e.target.src = "https://via.placeholder.com/150")}
           />
-          <img
-            className="w-6 h-6 md:w-8 md:h-8 cursor-pointer"
-            src={MinusCartIcon}
-            alt="Remove"
-            onClick={() => onHandleRemoveItem(item.id)}
-          />
+          <img className='w-6 h-6 md:w-8 md:h-8 cursor-pointer' src={MinusCartIcon} alt='Remove' onClick={() => onHandleRemoveItem(item.id)} />
         </div>
       </div>
     </div>
@@ -246,94 +236,77 @@ Please format your response using Markdown:
   };
 
   return (
-    <div className="flex justify-center min-h-screen bg-gray-900 px-4">
-      <div className="w-full md:w-10/12 lg:w-8/12 xl:w-6/12 max-w-2xl py-6">
-        <div className="w-full mb-4 md:mb-6 grid grid-cols-[1fr_auto] items-center gap-2">
-          <div className="min-w-0">
-            <div className="text-white text-sm md:text-base truncate">
-              <span className="truncate">{listName.replace(/-/g, " ")}</span>{" "}
-              list.
+    <div className='flex justify-center min-h-screen bg-gray-900 px-4'>
+      <div className='w-full md:w-10/12 lg:w-8/12 xl:w-6/12 max-w-2xl py-6'>
+        <div className='w-full mb-4 md:mb-6 grid grid-cols-[1fr_auto] items-center gap-2'>
+          <div className='min-w-0'>
+            <div className='text-white text-sm md:text-base truncate'>
+              <span className='truncate'>{listName.replace(/-/g, " ")}</span> list.
             </div>
-            {memberNames.length > 0 && (
-              <div className="text-gray-400 text-xs mt-1">
-                Members: {memberNames.join(", ")}
-              </div>
-            )}
+            {memberNames.length > 0 && <div className='text-gray-400 text-xs mt-1'>Members: {memberNames.join(", ")}</div>}
           </div>
-          <div className="flex gap-2">
+          <div className='flex gap-2'>
             <button
               onClick={handleClearList}
-              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 md:py-2 md:px-4 rounded-xl text-xs md:text-sm whitespace-nowrap"
+              className='bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 md:py-2 md:px-4 rounded-xl text-xs md:text-sm whitespace-nowrap'
             >
               Clear List
             </button>
             <button
               onClick={() => navigate("/")}
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 md:py-2 md:px-4 rounded-xl text-xs md:text-sm whitespace-nowrap"
+              className='bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 md:py-2 md:px-4 rounded-xl text-xs md:text-sm whitespace-nowrap'
             >
               Go Back
             </button>
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-2 mb-6 md:mb-10 w-full">
-          <form className="flex flex-1 gap-2" onSubmit={onHandleSearch}>
+        <div className='flex flex-col md:flex-row gap-2 mb-6 md:mb-10 w-full'>
+          <form className='flex flex-1 gap-2' onSubmit={onHandleSearch}>
             <input
-              placeholder="Add groceries..."
-              onChange={(e) => setImageSearch(e.target.value)}
+              placeholder='Add groceries...'
+              onChange={e => setImageSearch(e.target.value)}
               value={imageSearch}
-              className="text-black bg-white rounded-full outline-none pl-4 md:pl-6 pr-2 py-3 flex-1 text-sm md:text-base"
+              className='text-black bg-white rounded-full outline-none pl-4 md:pl-6 pr-2 py-3 flex-1 text-sm md:text-base'
               autoFocus
             />
             <button
-              type="submit"
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl text-sm md:text-base whitespace-nowrap"
+              type='submit'
+              className='bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl text-sm md:text-base whitespace-nowrap'
             >
               Add
             </button>
           </form>
         </div>
 
-        <div className="w-full">
+        <div className='w-full'>
           {groceryItems.length > 0 ? (
-            groceryItems.map((item) => (
-              <GroceryCard item={item} key={item.id} />
-            ))
+            groceryItems.map(item => <GroceryCard item={item} key={item.id} />)
           ) : (
-            <p className="text-white text-center text-sm md:text-base">
-              {listName.replace(/-/g, " ")} is empty
-            </p>
+            <p className='text-white text-center text-sm md:text-base'>{listName.replace(/-/g, " ")} is empty</p>
           )}
         </div>
-        <div className="text-center mt-10">
+        <div className='text-center mt-10'>
           {groceryItems.length > 0 && isLoading == false && (
             <div>
-              <button
-                onClick={onPromptSubmit}
-                className="underline text-xs text-green-500"
-              >
+              <button onClick={onPromptSubmit} className='underline text-xs text-green-500'>
                 Ask AI for recipes
               </button>
               {promptResult.length != 0 && (
-                <button
-                  onClick={() => setPromptResult("")}
-                  className="underline text-xs text-red-400 ml-4"
-                >
+                <button onClick={() => setPromptResult("")} className='underline text-xs text-red-400 ml-4'>
                   Clear text
                 </button>
               )}
             </div>
           )}
 
-          <div className="text-xs">
+          <div className='text-xs'>
             {isLoading ? (
               <LoadingScreen />
             ) : (
               promptResult && (
-                <div className="ai-response-container">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {promptResult}
-                  </ReactMarkdown>
+                <div className='ai-response-container'>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{promptResult}</ReactMarkdown>
                 </div>
               )
             )}
