@@ -1,12 +1,8 @@
 # Grocery List App 2.0
 
-Grocery list app built using React JS, Firebase and Tailwind. 
-
-This is a real-time collaborative grocery list application. Create, share, and manage shopping lists with your household, partner or friends. Are you lonely? Perfect! You can use the [1.0 version](https://github.com/Joaosilva27/grocery-list) of this app.
+This is a real-time collaborative grocery list application. Create, share, and manage shopping lists with your household, partner or friends. Are you lonely? You can use the simpler [1.0 version](https://github.com/Joaosilva27/grocery-list) of this app.
 
 Feel free to use the app: https://grocery-list20.vercel.app/
-
-API used to display image results: https://serper.dev/
 
 ## Features
 
@@ -29,6 +25,8 @@ https://github.com/user-attachments/assets/6b376bf8-994b-47e9-80bf-1aeb74025b7b
 - React JS
 
 - [Google's Gemini API](https://ai.google.dev/) (to generate recipes based on user's ingredients)
+
+- [Serper's Google Image API](https://serper.dev/) (to fetch the 1st google image result for each ingredient)
 
 - [Tailwind CSS](https://tailwindcss.com/)
 
