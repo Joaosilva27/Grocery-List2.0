@@ -4,6 +4,10 @@ This is a real-time collaborative grocery list application. Create, share, and m
 
 Feel free to use the app: https://grocery-list20.vercel.app/
 
+## Showcase
+
+<img src="https://github.com/user-attachments/assets/e119149b-ea40-44dc-bca3-d12a2c583281" alt="macbook-air-m2-lid-open" height="600rem">
+
 ## Features
 
 - **Real-time Sync** - Instant updates across all devices
