@@ -36,7 +36,7 @@ function ListPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-preview-04-17" });
 
   const [prompt, setPrompt] = useState(
     `I am using your prompt answer for my grocery list app where the user is able to click on a button called "search for a recipe" based on the grocery list items they have in their cart. You will reply to the user and bare in mind they are not able to reply to you, so do not ask the user any question since they cannot reply. You are not limited for recipes with only the grocery list items, you can obviously include basic items that most households have - for example milk, sugar, salt, water, etc... Based on what I just told you, give me recipe ideas that I could make with these items / ingredients: ${[
