@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import MinusCartIcon from "./Icons/cart-minus.png";
@@ -78,14 +78,11 @@ Please format your response using Markdown:
   useEffect(() => {
     if (!user || !listName) return;
 
-    const decodedListName = listName
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/[^a-zA-Z0-9-]/g, "");
+    // replace hyphens with spaces to match how it's stored
+    const originalListName = listName.replace(/-/g, " ");
 
     const listsRef = collection(db, "lists");
-    const listQuery = query(listsRef, where("name", "==", decodedListName));
+    const listQuery = query(listsRef, where("name", "==", originalListName));
 
     const unsubscribeList = onSnapshot(listQuery, async snapshot => {
       if (!snapshot.empty) {
@@ -106,6 +103,7 @@ Please format your response using Markdown:
         const names = userSnapshot.docs.map(doc => doc.data().displayName);
         setMemberNames(names);
       } else {
+        console.log("List not found, redirecting to home");
         navigate("/");
       }
     });
